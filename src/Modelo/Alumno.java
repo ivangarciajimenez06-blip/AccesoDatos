@@ -9,9 +9,6 @@ public class Alumno {
     private String apellidos;   // apellidos
     private LocalDate fechaNac; // fecha_nac
 
-    public Alumno() {
-    }
-
     public Alumno(Long idAlumno, String nombre, String apellidos, LocalDate fechaNac) {
         this.idAlumno = idAlumno;
         this.nombre = nombre;
