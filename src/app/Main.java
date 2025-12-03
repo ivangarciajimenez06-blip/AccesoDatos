@@ -12,12 +12,14 @@ public class Main {
 
     public static void main(String[] args) {
 
-        DAOFactory factory = DAOFactory.getDAOFactory(DAOFactory.MYSQL);
+        // ======= USO DEL SINGLETON ManagerDAO ========
+        ManagerDAO manager = ManagerDAO.getInstance();
 
-        AlumnoDAO alumnoDAO = factory.getAlumnoDAO();
-        ProfesorDAO profesorDAO = factory.getProfesorDAO();
-        AsignaturaDAO asignaturaDAO = factory.getAsignaturaDAO();
-        MatrículaDAO matriculaDAO = factory.getMatriculaDAO();
+        AlumnoDAO alumnoDAO = manager.getAlumnoDAO();
+        ProfesorDAO profesorDAO = manager.getProfesorDAO();
+        AsignaturaDAO asignaturaDAO = manager.getAsignaturaDAO();
+        MatrículaDAO matriculaDAO = manager.getMatrículaDAO();
+        // ==============================================
 
         int opcion;
 
@@ -28,12 +30,16 @@ public class Main {
             switch (opcion) {
                 case 1 -> insertarAlumno(alumnoDAO);
                 case 2 -> listarAlumnos(alumnoDAO);
+
                 case 3 -> insertarProfesor(profesorDAO);
                 case 4 -> listarProfesores(profesorDAO);
+
                 case 5 -> insertarAsignatura(asignaturaDAO);
                 case 6 -> listarAsignaturas(asignaturaDAO);
+
                 case 7 -> insertarMatricula(matriculaDAO);
                 case 8 -> listarMatriculas(matriculaDAO);
+
                 case 0 -> System.out.println("Saliendo...");
                 default -> System.out.println("Opción no válida.");
             }
@@ -43,7 +49,7 @@ public class Main {
         sc.close();
     }
 
-    // -------- MENU --------
+    // ======== MENÚ ========
 
     private static void mostrarMenu() {
         System.out.println("\n===== MENÚ INSTITUTO =====");
@@ -58,7 +64,7 @@ public class Main {
         System.out.println("0. Salir");
     }
 
-    // -------- ALUMNO --------
+    // ======== ALUMNOS ========
 
     private static void insertarAlumno(AlumnoDAO dao) {
         System.out.println("\n--- Insertar alumno ---");
@@ -70,6 +76,7 @@ public class Main {
 
         Alumno a = new Alumno(id, nombre, apellidos, fechaNac);
         dao.insertar(a);
+
         System.out.println("Alumno insertado correctamente.");
     }
 
@@ -83,7 +90,7 @@ public class Main {
         }
     }
 
-    // -------- PROFESOR --------
+    // ======== PROFESORES ========
 
     private static void insertarProfesor(ProfesorDAO dao) {
         System.out.println("\n--- Insertar profesor ---");
@@ -93,6 +100,7 @@ public class Main {
 
         Profesor p = new Profesor(id, nombre, apellidos);
         dao.insertar(p);
+
         System.out.println("Profesor insertado correctamente.");
     }
 
@@ -106,16 +114,17 @@ public class Main {
         }
     }
 
-    // -------- ASIGNATURA --------
+    // ======== ASIGNATURAS ========
 
     private static void insertarAsignatura(AsignaturaDAO dao) {
         System.out.println("\n--- Insertar asignatura ---");
         Long id = leerLong("ID asignatura: ");
         String nombre = leerTexto("Nombre: ");
-        Long idProfesor = leerLong("ID profesor responsable: ");
+        Long profesorId = leerLong("ID profesor responsable: ");
 
-        Asignatura a = new Asignatura(id, nombre, idProfesor);
+        Asignatura a = new Asignatura(id, nombre, profesorId);
         dao.insertar(a);
+
         System.out.println("Asignatura insertada correctamente.");
     }
 
@@ -129,19 +138,20 @@ public class Main {
         }
     }
 
-    // -------- MATRÍCULA --------
+    // ======== MATRÍCULAS ========
 
     private static void insertarMatricula(MatrículaDAO dao) {
         System.out.println("\n--- Insertar matrícula ---");
-        Long idAlumno = leerLong("ID alumno: ");
-        Long idAsignatura = leerLong("ID asignatura: ");
+        Long alumnoId = leerLong("ID alumno: ");
+        Long asignaturaId = leerLong("ID asignatura: ");
         Long fecha = leerLong("Año (YYYY): ");
         String notaStr = leerTexto("Nota (o vacío si null): ");
 
-        Integer nota = notaStr.isBlank() ? null : Integer.parseInt(notaStr);
+        Integer nota = notaStr.isBlank() ? null : Integer.valueOf(notaStr);
 
-        Matrícula m = new Matrícula(idAlumno, idAsignatura, fecha, nota);
+        Matrícula m = new Matrícula(alumnoId, asignaturaId, fecha, nota);
         dao.insertar(m);
+
         System.out.println("Matrícula insertada correctamente.");
     }
 
@@ -151,25 +161,26 @@ public class Main {
         if (lista.isEmpty()) {
             System.out.println("No hay matrículas.");
         } else {
-            lista.forEach(m -> System.out.println(
-                    "Alumno=" + m.getAlumno() +
-                            ", Asignatura=" + m.getAsignatura() +
-                            ", Año=" + m.getFecha() +
-                            ", Nota=" + m.getNota()
-            ));
+            lista.forEach(m ->
+                    System.out.println(
+                            "Alumno=" + m.getAlumno() +
+                                    ", Asignatura=" + m.getAsignatura() +
+                                    ", Año=" + m.getFecha() +
+                                    ", Nota=" + m.getNota()
+                    )
+            );
         }
     }
 
-    // -------- UTILIDADES LECTURA --------
+    // ======== UTILIDADES ========
 
     private static int leerEntero(String msg) {
         while (true) {
             try {
                 System.out.print(msg);
-                int n = Integer.parseInt(sc.nextLine());
-                return n;
-            } catch (NumberFormatException e) {
-                System.out.println("Introduce un número entero válido.");
+                return Integer.parseInt(sc.nextLine());
+            } catch (Exception e) {
+                System.out.println("Introduce un número válido.");
             }
         }
     }
@@ -178,9 +189,8 @@ public class Main {
         while (true) {
             try {
                 System.out.print(msg);
-                long n = Long.parseLong(sc.nextLine());
-                return n;
-            } catch (NumberFormatException e) {
+                return Long.parseLong(sc.nextLine());
+            } catch (Exception e) {
                 System.out.println("Introduce un número Long válido.");
             }
         }
